@@ -1,0 +1,8 @@
+#include <stdio.h>
+
+int main()
+{
+    int a=16500, b=116,c=0,d=0;
+    printf("получить из 16500 »> 116. 16500&116 = %d, »> %d\n",a&b,b);
+    return 0;
+}
