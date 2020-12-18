@@ -1,0 +1,174 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static int count=0;
+typedef struct telefon_kniga 
+{
+    char name[28+1]; 
+    char familia[28+1];
+    char nomer[28+1];
+}kniga;
+char mus_hran[128];
+
+void vypis_chel(kniga* p)
+{ 
+    printf("%-28s %-28s       %-28s\n",p->name,p->familia,p->nomer); 
+}
+ 
+kniga hran_chel()
+{
+    kniga p;
+    int k=0;
+    printf("name          :"); 
+    fgets(p.name,28,stdin);
+    p.name[strlen(p.name)-1]=0; 
+    if(p.name[0]>=97 && p.name[0]<=122) p.name[0]-=32;
+    for(k=0;k<=strlen(p.name)-1;k++)
+        {
+            if(k!=0 && p.name[k]>=65 && p.name[k]<=90) p.name[k]+=32;
+            if((p.name[k]>=33 && p.name[k]<=44) || (p.name[k]>=46 && p.name[k]<=64) || (p.name[k]>=91 && p.name[k]<=96) || (p.name[k]>=123 && p.name[k]<=127))
+            p.name[k]=1;
+        }
+    printf("familia       :");  
+    fgets(p.familia,28,stdin);
+    p.familia[strlen(p.familia)-1]=0;
+    if(p.familia[0]>=97 && p.familia[0]<=122) p.familia[0]-=32;
+    for(k=0;k<=strlen(p.familia)-1;k++)
+        {
+            if(k!=0 && p.familia[k]>=65 && p.familia[k]<=90) p.familia[k]+=32;
+            if((p.familia[k]>=33 && p.familia[k]<=44) || (p.familia[k]>=46 && p.familia[k]<=64) || (p.familia[k]>=91 && p.familia[k]<=96) || (p.familia[k]>=123 && p.familia[k]<=127))
+                p.familia[k]=1;
+        }
+    printf("nomer  :"); 
+    fgets(p.nomer,28,stdin);
+    p.nomer[strlen(p.nomer)-1]=0;
+    if (!( p.nomer[0]=='+' || (p.nomer[0] > 47 && p.nomer[0] < 58))) p.nomer[0]=32; 
+    for(k=1;k<=strlen(p.nomer)-1;k++)
+        {
+            if(p.nomer[k] <= 47 || p.nomer[k] >= 58)
+            p.nomer[k]=0;
+        } 
+    return p;
+}
+ 
+void sortier(kniga* a)
+{     
+    kniga* tmp;
+    int n,m;
+    for(n=1;n<count;n++)
+        for(m=0;m<count-n;m++)
+            {
+                int  code=strcmp(a[m+1].name,a[m].name);         
+                if(code<0)
+                    {
+                        tmp=malloc(sizeof(kniga));
+                        if(tmp!=NULL)
+                            {            
+                                *tmp=a[m];
+                                a[m]=a[m+1];
+                                a[m+1]=*tmp;
+                                free(tmp);
+                            } 
+                        else printf("\nError!");
+                    }
+            }
+}
+
+int main()
+{
+    int i=0,j=0;
+    kniga* person;  
+    printf("davayte poigraem so vsei informaciei o kontactah /familia name nomer/\n");
+    printf("vvodite info:\n"); 
+    person=malloc(sizeof (kniga));
+    
+    while(1)
+        {
+            int n,m;
+            person[count]=hran_chel(); count ++;
+            sortier(person);  
+            for (i=0;i<count;i++) vypis_chel(person+i);
+            do 
+                {
+                    printf("hotite zapisat' eche odnogo cheloveka? (d/n):"); 
+                    fgets(mus_hran,128,stdin);
+                } 
+            while (mus_hran[0] != 'd' && mus_hran[0] != 'n');
+            if(mus_hran[0]=='n') 
+            break; 
+            if(mus_hran[0]=='d')
+            {
+                person=realloc(person,sizeof(kniga)*(count+1));
+                if(person==NULL) 
+                {
+                    printf("udachi, nichego ne rabotaet ;)\n");
+                    exit(1);
+                }
+            }
+        }
+    
+    while(1)
+        {
+            char nomer_ok[28+1];
+            int temp=0;
+            printf("nachnem poisk po nomeru, vvedite\n");
+            fgets(nomer_ok,28,stdin);
+            nomer_ok[strlen(nomer_ok)-1]=0;
+            person=realloc(person,sizeof(kniga)*(count+1));
+            for(i=0;i<count;i++)
+                {
+                    if(strcmp(person[i].nomer,nomer_ok)==0) 
+                        {
+                            printf("%-28s %-28s       %-28s\n",person[i].name,person[i].familia,person[i].nomer);
+                            temp=1;
+                        } 
+                }
+            if(temp==0)  printf("ai oi, takogo cheloveka net\n");
+            break;
+        }
+        printf("teper' davaite kogo-nibud' udalim. vvedite ego nomer\n");
+
+    while(1)
+        {
+            char nomer_ok[28+1];
+            int temp=0;
+            fgets(nomer_ok,28,stdin);nomer_ok[strlen(nomer_ok)-1]=0;
+            person=realloc(person,sizeof(kniga)*(count+1));
+            for(i=0;i<count;i++)
+                {
+                    if(strcmp(person[i].nomer,nomer_ok)==0) 
+                        {
+                            printf("%-28s %-28s       %-28s\n",person[i].name,person[i].familia,person[i].nomer);
+                            printf("teper' on ischez iz bazy, mozhete ubeditcya:\n");
+                            memset(&person[i].name,0,sizeof(person[i].name));
+                            memset(&person[i].familia,0,sizeof(person[i].familia));
+                            memset(&person[i].nomer,0,sizeof(person[i].nomer));
+                            temp=1;
+                            
+                        }
+                }
+            if(temp==0)  printf("ai oi, takogo cheloveka net\n");
+            break;
+        }
+    
+     while(1)
+        {
+            char nomer_ok[28+1];
+            int temp=0;
+            printf("nachnem poisk po nomeru, vvedite\n");
+            fgets(nomer_ok,28,stdin);nomer_ok[strlen(nomer_ok)-1]=0;
+            person=realloc(person,sizeof(kniga)*(count+1));
+            for(i=0;i<count;i++)
+                {
+                    if(strcmp(person[i].nomer,nomer_ok)==0) 
+                        {
+                            printf("%-28s %-28s       %-28s\n",person[i].name,person[i].familia,person[i].nomer);
+                            temp=1;
+                        } 
+                }
+            if(temp==0)  printf("ai oi, takogo cheloveka net\n");
+            break;
+        }
+return 0;
+}
